@@ -18,7 +18,6 @@ def home():
 def upload():
 
     if "video" not in request.files:
-
         return jsonify({
             "success": False,
             "message": "没有收到视频"
@@ -26,14 +25,14 @@ def upload():
 
     file = request.files["video"]
 
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+
     return jsonify({
-
         "success": True,
-
         "filename": file.filename,
-
-        "size_bytes": len(file.read())
-
+        "size_bytes": size
     })
 
 
