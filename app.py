@@ -17,9 +17,9 @@ def home():
 def upload():
 
     if "video" not in request.files:
-    return jsonify({
-        "success": False,
-        "message": "没有收到视频"
+       return jsonify({
+           "success": False,
+           "message": "没有收到视频"
     })
 
 file = request.files["video"]
