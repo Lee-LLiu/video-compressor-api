@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
 import uuid
@@ -14,24 +14,14 @@ UPLOAD_FOLDER = "/tmp"
 def home():
     return "FFmpeg Video Compressor API Running"
 
-@app.route("/ffmpeg-test")
-def ffmpeg_test():
-    try:
-        result = subprocess.run(
-            ["ffmpeg", "-version"],
-            capture_output=True,
-            text=True
-        )
-        return jsonify({
-            "success": True,
-            "message": "FFmpeg 已安装",
-            "output": result.stdout[:200]
-        })
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        })
+@app.route("/download/<filename>")
+def download(filename):
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    if not os.path.exists(filepath):
+        return "文件不存在", 404
+
+    return send_file(filepath, as_attachment=True)
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -43,18 +33,44 @@ def upload():
 
     file = request.files["video"]
     uid = str(uuid.uuid4())
-    filename = uid + "_" + file.filename
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
 
-    file.save(filepath)
-    filesize = os.path.getsize(filepath)
+    input_name = f"{uid}_input.mp4"
+    output_name = f"{uid}_compressed.mp4"
+
+    input_path = os.path.join(UPLOAD_FOLDER, input_name)
+    output_path = os.path.join(UPLOAD_FOLDER, output_name)
+
+    file.save(input_path)
+
+    command = [
+        "ffmpeg",
+        "-i", input_path,
+        "-vcodec", "libx264",
+        "-crf", "32",
+        "-preset", "fast",
+        "-acodec", "aac",
+        "-b:a", "96k",
+        "-y",
+        output_path
+    ]
+
+    # 执行 FFmpeg 命令
+    subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True
+    )
+
+    original_size = os.path.getsize(input_path)
+    compressed_size = os.path.getsize(output_path)
 
     return jsonify({
         "success": True,
-        "message": "上传成功",
         "filename": file.filename,
-        "saved_path": filepath,
-        "size_bytes": filesize
+        "original_size": original_size,
+        "compressed_size": compressed_size,
+        "download_url": f"https://video-compressor-api-nl0b.onrender.com/download/{output_name}"
     })
 
 if __name__ == "__main__":
