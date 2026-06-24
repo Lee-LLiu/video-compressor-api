@@ -16,7 +16,7 @@ def home():
 @app.route("/upload", methods=["POST"])
 def upload():
 
-if "video" not in request.files:
+    if "video" not in request.files:
     return jsonify({
         "success": False,
         "message": "没有收到视频"
