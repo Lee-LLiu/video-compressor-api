@@ -50,11 +50,3 @@ app.run(
 host="0.0.0.0",
 port=10000
 )
-
-
-
-
-requirements.txt代码：
-Flask==3.1.0 
-gunicorn==23.0.0 
-flask-cors==6.0.1
