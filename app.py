@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import uuid
+import subprocess
 
 app = Flask(__name__)
 
@@ -12,6 +13,25 @@ UPLOAD_FOLDER = "/tmp"
 @app.route("/")
 def home():
     return "FFmpeg Video Compressor API Running"
+
+@app.route("/ffmpeg-test")
+def ffmpeg_test():
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-version"],
+            capture_output=True,
+            text=True
+        )
+        return jsonify({
+            "success": True,
+            "message": "FFmpeg 已安装",
+            "output": result.stdout[:200]
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        })
 
 @app.route("/upload", methods=["POST"])
 def upload():
