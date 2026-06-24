@@ -1,9 +1,10 @@
+app.py代码：
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import uuid
 
-app = Flask(name)
+app = Flask(__name__)
 
 CORS(app)
 
@@ -11,7 +12,7 @@ UPLOAD_FOLDER = "/tmp"
 
 @app.route("/")
 def home():
-return "FFmpeg Video Compressor API Running"
+    return "FFmpeg Video Compressor API Running"
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -45,8 +46,16 @@ return jsonify({
     "size_bytes": filesize
 })
 
-if name == "main":
+if __name__ == "__main__":
 app.run(
 host="0.0.0.0",
 port=10000
 )
+
+
+
+
+requirements.txt代码：
+Flask==3.1.0 
+gunicorn==23.0.0 
+flask-cors==6.0.1
