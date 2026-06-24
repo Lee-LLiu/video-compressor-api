@@ -3,7 +3,7 @@ from flask_cors import CORS
 import os
 import uuid
 
-app = Flask(__name__)
+app = Flask(name)
 
 CORS(app)
 
@@ -16,7 +16,6 @@ return "FFmpeg Video Compressor API Running"
 @app.route("/upload", methods=["POST"])
 def upload():
 
-```
 if "video" not in request.files:
     return jsonify({
         "success": False,
@@ -45,9 +44,8 @@ return jsonify({
     "saved_path": filepath,
     "size_bytes": filesize
 })
-```
 
-if __name__ == "__main__":
+if name == "main":
 app.run(
 host="0.0.0.0",
 port=10000
